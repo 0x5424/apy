@@ -21,11 +21,11 @@ class ApyTest < Minitest::Test
 
   def test_compound
     monthly_actual = compound(1200, rate: 0.1, times: 12, terms: 1)
-    weekly_actual = compound(1200, rate: 0.001923, times: 1, terms: 52)
-    daily_actual = compound(1200, rate: 0.000274, times: 1, terms: 365)
+    weekly_actual = compound(1200, rate: 0.1, times: 52, terms: 1)
+    daily_actual = compound(1200, rate: 0.1, times: 365, terms: 1)
 
     assert_in_delta 1325.66, monthly_actual, 0.01
     assert_in_delta 1326.07, weekly_actual, 0.01
-    assert_in_delta 1326.20, daily_actual, 0.01
+    assert_in_delta 1326.19, daily_actual, 0.01
   end
 end
