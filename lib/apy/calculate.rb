@@ -26,13 +26,22 @@ module Apy
       total_weight.sum / weighted_values.sum
     end
 
-    # Simple compound
+    # Simple compound, assuming no additional investment over successive maturity terms
     # @param principal [Numeric] Initial investment
-    # @param apy [Float] Expected interest rate for 1y
-    # @param times [Integer] Times the interest will be paid out over 1y
-    # @param terms [Integer] Number of years
-    def compound(principal, apy:, times:, terms:)
-      total_rate = 1 + (apy / times)
+    # @param rate [Float] Expected interest rate for the length of the period
+    # @param times [Integer] Times the interest will be paid out over the period
+    # @param terms [Integer] Number of terms
+    #
+    # @example Given a "10% APY", with interest paid monthly (1y maturity date):
+    #   compound(1200, rate: 0.1, times: 12, terms: 1) == 1325.66
+    #
+    # @example Given a "0.1923% WPY", with interest paid weekly (1w maturity date):
+    #   compound(1200, rate: 0.001923, times: 1, terms: 52) == 1326.07
+    #
+    # @example Given a "0.0274% DPY", with interest paid daily (1w maturity date):
+    #   compound(1200, rate: 0.000274, times: 1, terms: 365) == 1326.20
+    def compound(principal, rate:, times:, terms:)
+      total_rate = 1 + (rate / times)
 
       principal * (total_rate**(times * terms))
     end
