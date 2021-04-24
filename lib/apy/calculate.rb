@@ -36,9 +36,11 @@ module Apy
     #   compound(1200, rate: 0.1, times: 12, terms: 1) == 1325.66
     #
     # @example Given a "0.1923% WPY", with interest paid weekly (1w maturity date):
+    #   compound(1200, rate: 0.1, times: 52, terms: 1) == 1326.07
     #   compound(1200, rate: 0.001923, times: 1, terms: 52) == 1326.07
     #
-    # @example Given a "0.0274% DPY", with interest paid daily (1w maturity date):
+    # @example Given a "0.0274% DPY", with interest paid daily (1d maturity date):
+    #   compound(1200, rate: 0.1, times: 365, terms: 1) == 1326.19
     #   compound(1200, rate: 0.000274, times: 1, terms: 365) == 1326.20
     def compound(principal, rate:, times:, terms:)
       total_rate = 1 + (rate / times)
