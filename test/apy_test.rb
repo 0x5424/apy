@@ -28,4 +28,10 @@ class ApyTest < Minitest::Test
     assert_in_delta 1326.07, weekly_actual, 0.01
     assert_in_delta 1326.19, daily_actual, 0.01
   end
+
+  def test_dca_compound
+    monthly_2y_actual = dca_compound([[1200, 0.1], [1200, 0.1]], times: 12)
+
+    assert_in_delta 2790.125, monthly_2y_actual, 0.01
+  end
 end
