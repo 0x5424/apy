@@ -29,7 +29,7 @@ module Apy
     # Simple compound, assuming no additional investment over successive maturity terms
     # @param principal [Numeric] Initial investment
     # @param rate [Float] Expected interest rate for the length of the period
-    # @param times [Integer] Times the interest will be paid out over the period
+    # @param times [Integer] Times the interest will be paid out per term
     # @param terms [Integer] Number of terms
     #
     # @example Given a "10% APY", with interest paid monthly (1y maturity date):
@@ -46,6 +46,42 @@ module Apy
       total_rate = 1 + (rate / times)
 
       principal * (total_rate**(times * terms))
+    end
+
+    # "DCA" compound, assuming a recurring investment continuously added to the principal amount, this new amount _additionally_ compounded for the next period
+    # @param matrix [Array<Array(Numeric, Numeric)>] Matrix whose size is the number of terms; Each array item has the following elements: idx0 additional investment, idx1 the expected rate for the term
+    # @param times [Integer] Times the interest will be paid out per term
+    # @example Continuously investing 1200 dollars a year into a contract with a "10% APY", interest paid out once a month
+    #   dca_compound([[1200, 0.1], [1200, 0.1]], times: 12) == 2790.125
+    #
+    # @todo Clean this up, there is most likely an optimized formula for this 🤨
+    # @see #compound
+    def dca_compound(matrix, times:)
+      result = matrix.each_with_object(
+        total: 0,
+        interest: 0,
+        data: {
+          0 => {
+            ytd: 0,
+            in: 0,
+            interest: 0
+          }
+        }
+      ).with_index do |(ary, out), i|
+        additional_investment, rate = ary
+        prev_ytd = out[:data][i][:ytd]
+
+        to_compound = prev_ytd + additional_investment
+
+        current = compound(to_compound, rate: rate, times: times, terms: 1)
+        interest_this_period = current - to_compound
+
+        out[:total] += additional_investment + interest_this_period
+        out[:interest] += interest_this_period
+        out[:data][i + 1] = {ytd: current, in: additional_investment, interest: interest_this_period}
+      end
+
+      result.fetch(:total)
     end
   end
 end
