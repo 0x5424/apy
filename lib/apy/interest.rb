@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require "date"
-require_relative "calculate"
+require_relative "calculable"
 
 module Apy
-  # An interest object; Given an apy, prepares various methods to calculate with
+  # An interest object; Given an apy & date range, prepares various methods to calculate with
   class Interest
-    include Apy::Calculate
+    include Apy::Calculable
 
     attr_reader :apy
 
@@ -29,7 +29,7 @@ module Apy
     # Given a principal amount, return the ending balance
     # @param principal [Numeric] Initial investment
     # @param times [Integer] Number of times interest is paid out per term; Defaults to 1 (flat interest)
-    # @see Calculate#compound
+    # @see Calculable#compound
     def total(principal, times: 1)
       compound(principal, rate: apy, times: times, terms: @terms)
     end
@@ -38,8 +38,8 @@ module Apy
     # @param in_per_split [Numeric] Value of newly invested funds per term; Will be zipped with #apy & term size
     # @param times [Integer] Number of times interest is paid out per term; Defaults to 1 (flat interest)
     # @note This assumes you wish to maximize dca returns; the in_per_split is deposited before the interest is calculated
-    # @note If this method is too inflexible for your use case, you should use the {Calculate} module directly
-    # @see Calculate#dca_compound
+    # @note If this method is too inflexible for your use case, you should use the {Calculable} module directly
+    # @see Calculable#dca_compound
     # @example Investing 3.29 everyday for a year:
     #   Apy::Interest.new(apy: 0.1).dca(3.29, times: 365) == 1263.12
     # @example Investing 23.08 every week for a year:

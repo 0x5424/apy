@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "apy/calculate"
+require_relative "apy/calculable"
 require_relative "apy/interest"
 require_relative "apy/version"
 
