@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Apy
-  module Calculate
+  module Calculable
     # Calculate the weighted harmonic mean for a set of values
     # (∑w) / (∑w/i)
     # @param matrix [Array<Array<(Numeric, Numeric)>>] Matrix whose size is the number of investments, with the following array elements: idx0 invested amount, idx1 purchase price of the asset

@@ -3,9 +3,9 @@
 require "test_helper"
 
 class ApyTest < Minitest::Test
-  include Apy::Calculate
+  include Apy::Calculable
 
-  def test_weighted_harmonic_mean
+  def test_calculable_weighted_harmonic_mean
     inputs = [
       [1000, 156.23],
       [1000, 156.30],
@@ -19,7 +19,7 @@ class ApyTest < Minitest::Test
     assert_in_delta 174.57, actual, 0.01
   end
 
-  def test_compound
+  def test_calculable_compound
     monthly_actual = compound(1200, rate: 0.1, times: 12, terms: 1)
     weekly_actual = compound(1200, rate: 0.1, times: 52, terms: 1)
     daily_actual = compound(1200, rate: 0.1, times: 365, terms: 1)
@@ -29,7 +29,7 @@ class ApyTest < Minitest::Test
     assert_in_delta 1326.19, daily_actual, 0.01
   end
 
-  def test_dca_compound
+  def test_calculable_dca_compound
     monthly_2y_actual = dca_compound([[1200, 0.1], [1200, 0.1]], times: 12)
 
     assert_in_delta 2790.125, monthly_2y_actual, 0.01
