@@ -19,16 +19,32 @@ module Apy
     #   d1 = Date.parse "2020-01-01"
     #   d2 = Date.parse "2022-01-01"
     #   Interest.new(apy: 0.1, start_date: d1, end_date: d2)
+    # @example An interest object _yielding 10% over the course of 2y_:
+    #   d1 = Date.parse "2020-01-01"
+    #   d2 = Date.parse "2022-01-01"
+    #   Interest.new(apy: 0.1, start_date: d1, end_date: d2, days_per_term: 730)
+    # @example The above example, but instantiated with an apy of 5%:
+    #   d1 = Date.parse "2020-01-01"
+    #   d2 = Date.parse "2022-01-01"
+    #   Interest.new(apy: 0.05, start_date: d1, end_date: d2)
     def initialize(apy:, start_date: Date.today, end_date: Date.today.next_year, days_per_term: 365)
-      fail(ArgumentError, "apy must be positive") unless apy.positive?
+      fail(ArgumentError, "apy must be a positive Float") unless apy.positive? && apy.is_a?(Float)
 
       @apy = apy
-      @terms = get_term_size(start_date, end_date, days_per_term)
+      @terms = Interest.get_term_size(start_date, end_date, days_per_term)
+    end
+
+    class << self
+      # @param days_per_term [Integer] Number of days that pass before an entire term ends. Defaults to 365
+      # @return [Integer] The actual number of terms completed
+      def get_term_size(start_date, end_date, days_per_term)
+        ((end_date - start_date) / days_per_term).round
+      end
     end
 
     # Given a principal amount, return the ending balance
     # @param principal [Numeric] Initial investment
-    # @param times [Integer] Number of times interest is paid out per term; Defaults to 1 (flat interest)
+    # @param times [Integer] The number of times per term interest is accrued; Defaults to 1 (flat rate)
     # @see Calculable#compound
     def total(principal, times: 1)
       compound(principal, rate: apy, times: times, terms: @terms)
@@ -36,7 +52,7 @@ module Apy
 
     # Given a series of investments, calculate the DCA return
     # @param in_per_split [Numeric] Value of newly invested funds per term; Will be zipped with #apy & term size
-    # @param times [Integer] Number of times interest is paid out per term; Defaults to 1 (flat interest)
+    # @param times [Integer] The number of times per term interest is accrued; Defaults to 1 (flat rate)
     # @note This assumes you wish to maximize dca returns; the in_per_split is deposited before the interest is calculated
     # @note If this method is too inflexible for your use case, you should use the {Calculable} module directly
     # @see Calculable#dca_compound
@@ -56,14 +72,6 @@ module Apy
       range = split.times.map { [in_per_split, adjusted_apy] }
 
       dca_compound(range, times: times)
-    end
-
-    private
-
-    # @param days_per_term [Integer] Number of days that pass before an entire term ends. Defaults to 365
-    # @return [Integer] The actual number of terms completed
-    def get_term_size(start_date, end_date, days_per_term)
-      ((end_date - start_date) / days_per_term).round
     end
   end
 end
