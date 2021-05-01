@@ -9,3 +9,6 @@
 
 # Ignore lockfile to catch dependency issues
 /Gemfile.lock
+
+# Development console always looks messy
+bin/console

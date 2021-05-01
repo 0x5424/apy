@@ -32,8 +32,8 @@ Gem::Specification.new do |gemspec|
   # None :)
 
   # Dev Dependencies
-  gemspec.add_development_dependency "pry-byebug"
-  gemspec.add_development_dependency "rake"
+  gemspec.add_development_dependency "pry-byebug", "~> 3.9"
+  gemspec.add_development_dependency "rake", "~> 13"
   gemspec.add_development_dependency "minitest", "~> 5.0"
-  gemspec.add_development_dependency "standard"
+  gemspec.add_development_dependency "standard", "~> 1"
 end
