@@ -58,33 +58,39 @@ class ApyTest < Minitest::Test
   end
 
   def test_loan_payment_size
-    d1 = Date.parse "2020-01-01"
-    d2 = Date.parse "2021-01-01"
+    d1 = Date.parse "1999-01-01"
+    d2 = Date.parse "2000-01-01"
+    days = (d2 - d1).to_i
+
     loan = Apy::Loan.new(1200, apy: 0.1)
 
-    lump_sum_actual = loan.payment_size(start_date: d1, end_date: d2)
-    recurring_actual = loan.payment_size(start_date: d1, end_date: d2, payments_per_term: 12)
+    lump_sum_actual = loan.payment_size(days: days)
+    recurring_actual = loan.payment_size(days: days, payments_per_term: 12)
 
     assert_in_delta 1320.0, lump_sum_actual
     assert_in_delta 110.0, recurring_actual
   end
 
   def test_loan_total_owed
-    d1 = Date.parse "2020-01-01"
-    d2 = Date.parse "2021-01-01"
+    d1 = Date.parse "1999-01-01"
+    d2 = Date.parse "2000-01-01"
+    days = (d2 - d1).to_i
+
     loan = Apy::Loan.new(1200, apy: 0.1)
 
-    lump_sum_actual = loan.total_owed(start_date: d1, end_date: d2)
+    lump_sum_actual = loan.total_owed(days: days)
 
     assert_in_delta 1320.0, lump_sum_actual
   end
 
   def test_loan_amortized_payment_size
-    d1 = Date.parse "2020-01-01"
-    d2 = Date.parse "2021-01-01"
+    d1 = Date.parse "1999-01-01"
+    d2 = Date.parse "2000-01-01"
+    days = (d2 - d1).to_i
+
     loan = Apy::Loan.new(1200, apy: 0.1)
 
-    lump_sum_actual = loan.amorized_payment_size(start_date: d1, end_date: d2)
+    lump_sum_actual = loan.amortized_payment_size(days: days)
 
     assert_in_delta 105.5, lump_sum_actual, 0.01
   end

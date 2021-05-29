@@ -11,34 +11,37 @@ module Apy
     attr_reader :apy
 
     # @param apy [Float] Annual/Average Percent Yield -- an expected pct return over the course of a _year_
-    # @param start_date [Date] The beginning of the interest period; Defaults to today
-    # @param end_date [Date] The end of the interest period; Defaults to 1y from today
-    # @param days_per_term [Integer] Days per compound interest term; Defaults to 365 days
+    # @param days [Integer] Number of days this plan accrues interest; Defaults to 365
+    # @param days_per_term [Integer] Days per compound interest term; Defaults to 365
     #
     # @example A 10% APY, intended to be used in calculations over 2y:
     #   d1 = Date.parse "2020-01-01"
     #   d2 = Date.parse "2022-01-01"
-    #   Interest.new(apy: 0.1, start_date: d1, end_date: d2)
+    #   days = (d2 - d1).to_i
+    #   Interest.new(apy: 0.1, days: days)
     # @example An interest object _yielding 10% over the course of 2y_:
     #   d1 = Date.parse "2020-01-01"
     #   d2 = Date.parse "2022-01-01"
-    #   Interest.new(apy: 0.1, start_date: d1, end_date: d2, days_per_term: 730)
+    #   days = (d2 - d1).to_i
+    #   Interest.new(apy: 0.1, days: days, days_per_term: 730)
     # @example The above example, but instantiated with an apy of 5%:
     #   d1 = Date.parse "2020-01-01"
     #   d2 = Date.parse "2022-01-01"
-    #   Interest.new(apy: 0.05, start_date: d1, end_date: d2)
-    def initialize(apy:, start_date: Date.today, end_date: Date.today.next_year, days_per_term: 365)
+    #   days = (d2 - d1).to_i
+    #   Interest.new(apy: 0.05, days: days)
+    def initialize(apy:, days: 365, days_per_term: 365)
       fail(ArgumentError, "apy must be a positive Float") unless apy.positive? && apy.is_a?(Float)
 
       @apy = apy
-      @terms = Interest.get_term_size(start_date, end_date, days_per_term)
+      @terms = Interest.get_term_size(days, days_per_term)
     end
 
     class << self
-      # @param days_per_term [Integer] Number of days that pass before an entire term ends. Defaults to 365
-      # @return [Integer] The actual number of terms completed
-      def get_term_size(start_date, end_date, days_per_term)
-        ((end_date - start_date) / days_per_term).round
+      # @param days [Integer] Number of days to let interest accrue
+      # @param days_per_term [Integer] Number of days that pass before an entire term ends
+      # @return [Integer] The full number of terms completed
+      def get_term_size(days, days_per_term)
+        (days / days_per_term).round
       end
     end
 
