@@ -3,8 +3,6 @@
 Various helpers for calculating interest
 
 ## TODO
-- [ ] Amortization
-- [ ] Update method signatures to only use day counts
 - [ ] Comprehensive examples w/ tests
 - [ ] Setup ci
 

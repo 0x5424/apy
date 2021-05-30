@@ -30,7 +30,7 @@ module Apy
     #   Loan.new(1200, apy: 0.1).payment_size(days: days, payments_per_term: 12) == 110.0
     # @example Payment size for 1200, interest accrued 12 times, repaid in 12 payments across 365 days:
     #   Loan.new(1200, apy: 0.1).payment_size(days: days, times: 12) == 110.47
-    def payment_size(days:, times: 1, days_per_term: 365, payments_per_term: times)
+    def payment_size(days:, times: 1, days_per_term: days, payments_per_term: times)
       total_owed(
         days: days,
         times: times,
@@ -42,10 +42,9 @@ module Apy
     # @param days [Integer] Days until the loan is fully paid off
     # @param times [Integer] The number of times per term interest is accrued; Defaults to 1 (flat rate)
     # @param days_per_term [Integer] The number of days per interest term
-    # @note Because the constructor accepts an APY for the year, an adjusted rate is used here based on days_per_term
     # @see Interest#total
     # @see #adjusted_apy
-    def total_owed(days:, times: 1, days_per_term: 365)
+    def total_owed(days:, times: 1, days_per_term: days)
       Apy::Interest.new(
         apy: adjusted_apy(days, days_per_term),
         days: days,
@@ -54,23 +53,31 @@ module Apy
     end
 
     # Similar to payment_size, except interest accrues based on the remaining debt
-    # @todo Finish this
+    # @note This currently only works with years... should refactor this to accept alternative ranges
     # @todo Once finished, make #payment_size accept less args (lump-sum, _only_ accept payment count)
-    # @example Amortized payment size for 1200, interest accrued 12 times, repaid in 12 payments across 365 days:
-    #   Loan.new(1200, apy: 0.1).amortized_payment_size(days: days, times: 12) == 105.50
-    def amortized_payment_size(days:, times: 1, days_per_term: 365, payments_per_term: times)
-      fail
+    # @example Amortized payment size for 100000@10%, repaid over 20 years
+    #   Loan.new(100000, apy: 0.1).amortized_payment_size(terms: 20, times: 12) == 965.0216
+    def amortized_payment_size(terms:, times: 12, days_per_term: 365)
+      years = (terms * days_per_term) / 365
+
+      (apy * borrow) / (times * (1 - ((1 + (apy / times))**(-1 * times * years))))
     end
 
-    # @todo Finish this
     # @todo Once finished, make #total_owed accept less args (lump-sum, _only_ accept payment count)
-    def amortized_total_owed(days:, times: 1, days_per_term: 365, payments_per_term: times)
-      fail
+    # @example Amortized total owed on 100000@10%, repaid over 20 years
+    #   Loan.new(100000, apy: 0.1).amortized_payment_size(terms: 20, times: 12) == 231605.2
+    def amortized_total_owed(terms:, times: 12, days_per_term: 365)
+      size = amortized_payment_size(terms: terms, times: times, days_per_term: days_per_term)
+
+      times * size * terms
     end
 
     private
 
+    # In the event days & days_per_term diverges, calculate an adjusted apy
     # `apy / (days / days_per_term)`
+    # @example A 10% APY, but interest is to be calculated _per day_:
+    #   Interest.new(apy: 0.1).send(:adjusted_apy, 365, 1) == 0.00027397260273972606 # % per day
     def adjusted_apy(days, days_per_term)
       apy / (days / days_per_term)
     end

@@ -85,13 +85,25 @@ class ApyTest < Minitest::Test
 
   def test_loan_amortized_payment_size
     d1 = Date.parse "1999-01-01"
-    d2 = Date.parse "2000-01-01"
-    days = (d2 - d1).to_i
+    d2 = Date.parse "2019-01-01"
+    terms = ((d2 - d1) / 365).to_i
 
-    loan = Apy::Loan.new(1200, apy: 0.1)
+    loan = Apy::Loan.new(100_000, apy: 0.1)
 
-    lump_sum_actual = loan.amortized_payment_size(days: days)
+    payment_size_actual = loan.amortized_payment_size(terms: terms)
 
-    assert_in_delta 105.5, lump_sum_actual, 0.01
+    assert_in_delta 965.0216, payment_size_actual, 0.01
+  end
+
+  def test_loan_amortized_total_owed
+    d1 = Date.parse "1999-01-01"
+    d2 = Date.parse "2019-01-01"
+    terms = ((d2 - d1) / 365).to_i
+
+    loan = Apy::Loan.new(100_000, apy: 0.1)
+
+    total_owed_actual = loan.amortized_total_owed(terms: terms)
+
+    assert_in_delta 231605.194, total_owed_actual, 0.01
   end
 end
