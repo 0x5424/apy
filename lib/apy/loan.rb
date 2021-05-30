@@ -56,6 +56,8 @@ module Apy
     # Similar to payment_size, except interest accrues based on the remaining debt
     # @todo Finish this
     # @todo Once finished, make #payment_size accept less args (lump-sum, _only_ accept payment count)
+    # @example Amortized payment size for 1200, interest accrued 12 times, repaid in 12 payments across 365 days:
+    #   Loan.new(1200, apy: 0.1).amortized_payment_size(days: days, times: 12) == 105.50
     def amortized_payment_size(days:, times: 1, days_per_term: 365, payments_per_term: times)
       fail
     end

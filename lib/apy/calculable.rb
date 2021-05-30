@@ -51,12 +51,14 @@ module Apy
     # "DCA" compound, assuming a recurring investment continuously added to the principal amount, this new amount _additionally_ compounded for the next period
     # @param matrix [Array<Array(Numeric, Numeric)>] Matrix whose size is the number of terms; Each array item has the following elements: idx0 additional investment, idx1 the expected rate for the term
     # @param times [Integer] Times the interest will be paid out per term
+    # @param block [Proc] If provided, it exposes the `prev_ytd` and `additional_investment` to produce an amount which should be compounded that year
     # @example Continuously investing 1200 dollars a year into a contract with a "10% APY", interest paid out once a month
     #   dca_compound([[1200, 0.1], [1200, 0.1]], times: 12) == 2790.125
     #
     # @todo Clean this up, there is most likely an optimized formula for this 🤨
     # @see #compound
-    def dca_compound(matrix, times:)
+    def dca_compound(matrix, times:, return_result: false, &block)
+      block = block_given? ? block : proc { |x, y| x + y }
       result = matrix.each_with_object(
         total: 0,
         interest: 0,
@@ -71,7 +73,7 @@ module Apy
         additional_investment, rate = ary
         prev_ytd = out[:data][i][:ytd]
 
-        to_compound = prev_ytd + additional_investment
+        to_compound = block.call(prev_ytd, additional_investment)
 
         current = compound(to_compound, rate: rate, times: times, terms: 1)
         interest_this_period = current - to_compound
@@ -81,7 +83,7 @@ module Apy
         out[:data][i + 1] = {ytd: current, in: additional_investment, interest: interest_this_period}
       end
 
-      result.fetch(:total)
+      return_result ? result : result.fetch(:total)
     end
   end
 end
